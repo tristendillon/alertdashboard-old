@@ -349,6 +349,7 @@ export class DispatchRoutineRouter extends RoutineRouter {
       api.dispatches.getDispatchTypes,
       {}
     )
+    this.ctx.logger.info(`Retrieved ${dispatchTypes.length} dispatch types, default: ${dispatchTypes.find((type) => type.default)?.code ?? 'none'}`)
     timer.end()
     return dispatchTypes
   }
@@ -407,7 +408,18 @@ export class DispatchRoutineRouter extends RoutineRouter {
   }
 
   private parseFirstDueDispatch(dispatch: FirstDueDispatch): PostDispatch {
+    let dispatchType = this.dispatchTypes.find(
+      (type) => type.code.toLowerCase() === dispatch.type?.toLowerCase()
+    )
+    if (!dispatchType) {
+      dispatchType = this.dispatchTypes.find(
+        (type) => type.default
+      )!
+      this.ctx.logger.warn(`Dispatch ${dispatch.type} not found, using default dispatch type ${dispatchType.code}`)
+    }
+
     return {
+      dispatchType: dispatchType._id,
       dispatchId: Number(dispatch.id),
       type: dispatch.type ?? '',
       address: dispatch.address ?? '',
@@ -679,16 +691,10 @@ export class DispatchRoutineRouter extends RoutineRouter {
     })
 
     try {
-      const dispatchTypeMap = new Map(
-        this.dispatchTypes.map((type) => [type.code.toLowerCase(), type._id])
-      )
-      const dispatchesWithTypes = dispatches.map((dispatch) => ({
-        ...dispatch,
-        dispatchType: dispatchTypeMap.get(dispatch.type?.toLowerCase()),
-      }))
+
       const result = await this.ctx.client.mutation(
         api.dispatches.createDispatches,
-        { dispatches: dispatchesWithTypes, apiKey: config.convexApiKey }
+        { dispatches: dispatches, apiKey: config.convexApiKey }
       )
 
       this.stats.totalInserted += result.length

@@ -40,7 +40,7 @@ export const DispatchesSchema = Dispatches.extend({
   _creationTime: z.number(),
 })
 export const DispatchesTable = Table('dispatches', DispatchesValidator.fields)
-export type PostDispatch = WithoutSystemFields<Doc<'dispatches'>>
+export type PostDispatch = Omit<WithoutSystemFields<Doc<'dispatches'>>, 'dispatchGroup'>
 export type Dispatch = z.infer<typeof DispatchesSchema> & {
   _id: Id<'dispatches'>
   _creationTime: number
@@ -52,6 +52,7 @@ export const DispatchTypes = z.object({
   code: z.string(),
   group: DispatchGroupEnumSchema,
   name: z.string().optional(),
+  default: z.boolean().optional(),
 })
 
 export const DispatchTypesSchema = DispatchTypes.extend({
