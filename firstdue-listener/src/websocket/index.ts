@@ -1,6 +1,7 @@
-import { Server as HttpServer } from 'http'
+import { Server as HttpServer, IncomingMessage } from 'http'
 import { WebSocketServer, WebSocket } from 'ws'
 import { logBroadcaster, LogEntry, BaseLogger } from '@/logger'
+import { config } from '@/config'
 
 const logger = new BaseLogger('WebSocket')
 
@@ -12,8 +13,47 @@ interface ClientConnection {
 let wss: WebSocketServer | null = null
 const clients = new Map<WebSocket, ClientConnection>()
 
+function verifyClient(
+  info: { origin: string; secure: boolean; req: IncomingMessage },
+  callback: (result: boolean, code?: number, message?: string) => void
+): void {
+  // If no API key is configured, warn and allow access
+  if (!config.appApiKey) {
+    logger.warn(
+      'No API key configured (API_KEY environment variable). WebSocket will be open with no authentication.',
+      { origin: info.origin }
+    )
+    callback(true)
+    return
+  }
+
+  // Extract API key from query parameters
+  const url = new URL(info.req.url || '', `http://${info.req.headers.host}`)
+  const providedApiKey = url.searchParams.get('API_KEY')
+
+  // Check if API key was provided
+  if (!providedApiKey) {
+    logger.warn('WebSocket connection rejected: No API key provided', {
+      origin: info.origin,
+    })
+    callback(false, 401, 'API key required')
+    return
+  }
+
+  // Validate API key
+  if (providedApiKey !== config.appApiKey) {
+    logger.warn('WebSocket connection rejected: Invalid API key', {
+      origin: info.origin,
+    })
+    callback(false, 401, 'Invalid API key')
+    return
+  }
+
+  callback(true)
+}
+
 export function setupWebSocketServer(server: HttpServer): WebSocketServer {
-  wss = new WebSocketServer({ server, path: '/ws/logs' })
+  wss = new WebSocketServer({ server, path: '/ws/logs', verifyClient })
 
   const unsubscribe = logBroadcaster.subscribe((entry: LogEntry) => {
     clients.forEach((client) => {
