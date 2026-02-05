@@ -22,13 +22,17 @@
     "express": "^5.1.0",
     "express-winston": "^4.2.0",
     "moment-timezone": "^0.6.0",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-transport": "^4.9.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/express-winston": "^4.0.2",
     "@types/node": "^24.0.3",
     "@types/winston": "^2.4.4",
+    "@types/ws": "^8.5.12",
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
     "typescript": "^5.8.2",

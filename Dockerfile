@@ -17,6 +17,7 @@ RUN turbo run build --filter=@sizeupdashboard/firstdue-listener --cache-dir=.tur
 FROM node:22-alpine
 RUN npm install -g pnpm@10.11.0
 WORKDIR /app
+RUN mkdir -p /app/logs
 
 COPY --from=builder /app/convex ./convex
 COPY --from=builder /app/firstdue-listener ./firstdue-listener

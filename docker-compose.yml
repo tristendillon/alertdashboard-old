@@ -10,7 +10,13 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    volumes:
+      - firstdue-logs:/app/logs
 
 networks:
   nginx-net:
     driver: bridge
+
+volumes:
+  firstdue-logs:
+    driver: local

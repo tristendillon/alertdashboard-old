@@ -5,6 +5,7 @@ import { DispatchRoutineRouter } from './routes/dispatch'
 import { RoutineRouter } from './routes/routineRouter'
 import { WeatherRoutineRouter } from './routes/weather'
 import { HydrantsRoutineRouter } from './routes/hydrants'
+import { logsRouter } from './routes/logs'
 import { authMiddleware } from './lib/auth-middleware'
 
 export function createApp(): {
@@ -43,6 +44,8 @@ export function createApp(): {
       `Mounted ${routineRouter.name} routes at /api/routines/${routeName} with ${routineRouter.routes.stack.length} routes`
     )
   })
+
+  app.use('/api/logs', logsRouter)
 
   return { app, routines: routineRoutes }
 }

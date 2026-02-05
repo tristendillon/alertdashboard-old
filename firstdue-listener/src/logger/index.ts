@@ -1,6 +1,8 @@
 export { BaseLogger, LogMeta } from './baseLogger'
 export { LogLevel } from '@/config'
 export { RoutineLogger } from './routineLogger'
+export { logBroadcaster, type LogEntry } from './logBroadcaster'
+export { LOG_DIR } from './fileLogger'
 
 import winston from 'winston'
 import moment from 'moment-timezone'

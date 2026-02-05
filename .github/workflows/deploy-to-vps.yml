@@ -38,6 +38,9 @@ jobs:
             PORT=${{ secrets.PORT }}
             TIMEZONE=${{ vars.TIMEZONE }}
             LOG_LEVEL=${{ vars.LOG_LEVEL }}
+            LOG_DIR=${{ vars.LOG_DIR }}
+            LOG_MAX_SIZE=${{ vars.LOG_MAX_SIZE }}
+            LOG_RETENTION_DAYS=${{ vars.LOG_RETENTION_DAYS }}
             CONVEX_URL=${{ vars.CONVEX_URL }}
             WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
             WEATHER_LAT=${{ vars.WEATHER_LAT }}

@@ -12,6 +12,9 @@ export const config = {
   timezone: process.env.TIMEZONE || 'America/Chicago',
   logLevel: (process.env.LOG_LEVEL ||
     (process.env.NODE_ENV === 'development' ? 'debug' : 'info')) as LogLevel,
+  logDir: process.env.LOG_DIR || '/app/logs',
+  logMaxSize: process.env.LOG_MAX_SIZE || '50m',
+  logRetentionDays: process.env.LOG_RETENTION_DAYS || '14',
   firstdueApiKey: process.env.FIRSTDUE_API_KEY,
   firstdueApiUrl: 'https://sizeup.firstduesizeup.com/fd-api/v1',
   weather: {

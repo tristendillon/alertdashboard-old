@@ -2,6 +2,7 @@ import winston from 'winston'
 import moment from 'moment-timezone'
 import chalk from 'chalk'
 import { config, LogLevel } from '@/config'
+import { fileTransports } from './fileLogger'
 
 export type LogMeta = Record<string, unknown>
 
@@ -75,13 +76,7 @@ interface LogInfo {
 export class BaseLogger {
   protected logger: winston.Logger
   public perf: Perf
-  private logs: LogInfo[] = []
   private context?: string
-  private readonly maxLogs: number = 500 // Keep last 500 logs
-
-  public getRecentLogs(limit: number): LogInfo[] {
-    return this.logs.slice(-limit)
-  }
 
   constructor(context?: string) {
     this.context = context
@@ -129,49 +124,29 @@ export class BaseLogger {
         })
       ),
       defaultMeta: context ? { context } : {},
-      transports: [new winston.transports.Console()],
+      transports: [new winston.transports.Console(), ...fileTransports],
     })
     this.perf = new Perf(this.logger)
   }
 
-  private addLog(level: LogLevel, message: string, meta?: LogMeta): void {
-    this.logs.push({
-      timestamp: moment()
-        .tz(config.timezone)
-        .format('YYYY-MM-DD HH:mm:ss.SSS Z'),
-      level,
-      message,
-      context: this.context,
-      ...meta,
-    })
-    if (this.logs.length > this.maxLogs) {
-      this.logs.shift()
-    }
-  }
-
   info(message: string, meta?: LogMeta): void {
     this.logger.info(message, meta)
-    this.addLog('info', message, meta)
   }
 
   warn(message: string, meta?: LogMeta): void {
     this.logger.warn(message, meta)
-    this.addLog('warn', message, meta)
   }
 
   error(message: string, meta?: LogMeta): void {
     this.logger.error(message, meta)
-    this.addLog('error', message, meta)
   }
 
   debug(message: string, meta?: LogMeta): void {
     this.logger.debug(message, meta)
-    this.addLog('debug', message, meta)
   }
 
   timer(message: string, meta?: LogMeta): void {
     this.logger.log('timer', message, meta)
-    this.addLog('timer', message, meta)
   }
 
   getWinstonInstance(): winston.Logger {

@@ -654,6 +654,7 @@ export class DispatchRoutineRouter extends RoutineRouter {
       this.ctx.logger.debug(`API URL: ${url.toString()}`)
 
       // Use bound fetch with retry logic
+    
       const response = await this.fetchWithRetry(url, {
         headers: {
           'Content-Type': 'application/json',
