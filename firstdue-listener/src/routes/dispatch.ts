@@ -421,7 +421,7 @@ export class DispatchRoutineRouter extends RoutineRouter {
     return {
       dispatchType: dispatchType._id,
       dispatchId: Number(dispatch.id),
-      type: dispatch.type ?? '',
+      type: dispatchType.code ?? '',
       address: dispatch.address ?? '',
       address2: dispatch.address2 ?? undefined,
       city: dispatch.city ?? undefined,
@@ -654,7 +654,7 @@ export class DispatchRoutineRouter extends RoutineRouter {
       this.ctx.logger.debug(`API URL: ${url.toString()}`)
 
       // Use bound fetch with retry logic
-    
+
       const response = await this.fetchWithRetry(url, {
         headers: {
           'Content-Type': 'application/json',

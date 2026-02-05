@@ -198,8 +198,6 @@ export class WeatherRoutineRouter extends RoutineRouter {
     // Force delete old weather data
     this.addRoute('post', '/cleanup', this.handleCleanup.bind(this))
 
-    // Get latest weather data summary
-    this.addRoute('get', '/current-data', this.handleGetCurrentData.bind(this))
   }
 
   public async execute(): Promise<void> {
@@ -392,38 +390,6 @@ export class WeatherRoutineRouter extends RoutineRouter {
       res.json({
         message: 'Cleanup completed successfully',
         deletedOldIds: oldIdsDeleted,
-        stats: this.calculateCurrentStats(),
-      })
-    } catch (error) {
-      this.stats.errorCount++
-      throw error
-    }
-  }
-
-  private async handleGetCurrentData(
-    _req: Request,
-    res: Response
-  ): Promise<void> {
-    try {
-      const dataTimer = this.ctx.logger.perf.start({
-        id: 'getCurrentWeatherSummary',
-        printf: (duration: number) =>
-          `Retrieved current weather summary in ${duration}ms`,
-      })
-
-      const currentWeather = await this.ctx.client.query(
-        api.weather.getWeatherForecast,
-        {
-          date: new Date().getTime(),
-          days: 1,
-        }
-      )
-
-      dataTimer.end()
-
-      res.json({
-        forecast: currentWeather,
-        lastUpdate: this.stats.lastUpdateTime,
         stats: this.calculateCurrentStats(),
       })
     } catch (error) {
