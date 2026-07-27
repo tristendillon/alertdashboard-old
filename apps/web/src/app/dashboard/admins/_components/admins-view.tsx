@@ -29,6 +29,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -41,7 +42,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { inviteAdmin, removeAdmin, revokeInvitation } from "../actions";
+import {
+  inviteAdmin,
+  removeAdmin,
+  revokeInvitation,
+  type ActionResult,
+} from "../actions";
 
 export interface AdminUser {
   id: string;
@@ -220,11 +226,17 @@ function InviteAdminDialog() {
     defaultValues: { email: "" },
     onSubmit: async ({ value }) => {
       try {
-        await inviteAdmin(value.email);
+        const result = await inviteAdmin(value.email);
+        if (!result.ok) {
+          // The action reports expected failures (bad email, Clerk 422) as
+          // data — Next would have redacted them had they been thrown.
+          toast.error(result.error);
+          return;
+        }
         toast.success(`Invitation sent to ${value.email.trim()}`);
-        form.reset();
         setOpen(false);
       } catch (error) {
+        // Only genuine transport failures reach here (offline, worker 5xx).
         toast.error(
           error instanceof Error ? error.message : "Failed to send invitation",
         );
@@ -232,12 +244,25 @@ function InviteAdminDialog() {
     },
   });
 
+  // Reset on close, not on success: cancelling a half-typed invite used to
+  // leave the stale email and its red validation error sitting there on
+  // reopen. Routing every close through here covers Escape, overlay click and
+  // the Cancel button alike.
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) form.reset();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Button size="sm" onClick={() => setOpen(true)}>
-        <MailPlus className="mr-1 size-4" />
-        Invite admin
-      </Button>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {/* Must be a DialogTrigger, not a bare button — Radix needs it to
+          return focus to this button when the dialog closes. */}
+      <DialogTrigger asChild>
+        <Button size="sm">
+          <MailPlus className="mr-1 size-4" />
+          Invite admin
+        </Button>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite admin</DialogTitle>
@@ -282,7 +307,11 @@ function InviteAdminDialog() {
           </form.Field>
         </form>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleOpenChange(false)}
+          >
             Cancel
           </Button>
           <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]}>
@@ -304,7 +333,7 @@ interface ConfirmActionProps {
   confirmLabel: string;
   srLabel: string;
   icon: React.ReactNode;
-  action: () => Promise<void>;
+  action: () => Promise<ActionResult>;
   successMessage: string;
   destructive?: boolean;
 }
@@ -325,10 +354,16 @@ function ConfirmAction({
   const run = () => {
     startTransition(async () => {
       try {
-        await action();
+        const result = await action();
+        if (!result.ok) {
+          // Keep the dialog open on failure so the user can retry or cancel.
+          toast.error(result.error);
+          return;
+        }
         toast.success(successMessage);
         setOpen(false);
       } catch (error) {
+        // Only genuine transport failures reach here.
         toast.error(error instanceof Error ? error.message : "Action failed");
       }
     });

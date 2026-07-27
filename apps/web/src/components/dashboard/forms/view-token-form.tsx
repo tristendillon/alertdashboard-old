@@ -1,9 +1,11 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { toast } from "sonner";
 import { api } from "@sizeupdashboard/convex/src/api/_generated/api.js";
+import type { Id } from "@sizeupdashboard/convex/src/api/_generated/dataModel.js";
+import type { ViewToken } from "@sizeupdashboard/convex/src/api/schema.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,23 +16,74 @@ import {
   SheetDescription,
   SheetFooter,
 } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// View tokens are create-only (no update mutation); the token is generated
-// server-side, so the form collects just a name.
-export function ViewTokenForm({ onDone }: { onDone: () => void }) {
+interface ViewTokenFormProps {
+  id?: string;
+  onDone: () => void;
+}
+
+// The token value is generated server-side and is never editable (viewers
+// authenticate with it), so the form collects just a name in both modes.
+export function ViewTokenForm({ id, onDone }: ViewTokenFormProps) {
+  // Edit hydration: fetch the single row by id. The table is paginated, so
+  // reading the list and finding the row would miss rows past the first page.
+  const existing = useQuery(
+    api.viewToken.getViewTokenById,
+    id ? { id: id as Id<"viewTokens"> } : "skip",
+  );
+
+  if (id && existing === undefined) {
+    return (
+      <div className="space-y-3 p-4">
+        <Skeleton className="h-8 w-2/3" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
+
+  if (id && !existing) {
+    return (
+      <div className="p-4">
+        <SheetHeader>
+          <SheetTitle>View token not found</SheetTitle>
+        </SheetHeader>
+        <Button className="mt-4" variant="outline" onClick={onDone}>
+          Close
+        </Button>
+      </div>
+    );
+  }
+
+  return <ViewTokenFormInner existing={existing ?? null} onDone={onDone} />;
+}
+
+function ViewTokenFormInner({
+  existing,
+  onDone,
+}: {
+  existing: ViewToken | null;
+  onDone: () => void;
+}) {
+  const isEdit = existing !== null;
   const createViewToken = useMutation(api.viewToken.createViewToken);
+  const updateViewToken = useMutation(api.viewToken.updateViewToken);
 
   const form = useForm({
-    defaultValues: { name: "" },
+    defaultValues: { name: existing?.name ?? "" },
     onSubmit: async ({ value }) => {
       try {
-        await createViewToken({ name: value.name.trim() });
-        toast.success("View token created");
+        if (isEdit && existing) {
+          await updateViewToken({ id: existing._id, name: value.name.trim() });
+          toast.success("View token updated");
+        } else {
+          await createViewToken({ name: value.name.trim() });
+          toast.success("View token created");
+        }
         onDone();
       } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Failed to create view token",
-        );
+        toast.error(error instanceof Error ? error.message : "Save failed");
       }
     },
   });
@@ -38,10 +91,11 @@ export function ViewTokenForm({ onDone }: { onDone: () => void }) {
   return (
     <>
       <SheetHeader>
-        <SheetTitle>New view token</SheetTitle>
+        <SheetTitle>{isEdit ? "Edit view token" : "New view token"}</SheetTitle>
         <SheetDescription>
-          Creates a token for a kiosk/display. The token value is generated
-          automatically.
+          {isEdit
+            ? "Renames this kiosk/display token. The token value itself cannot be changed — displays already using it keep working."
+            : "Creates a token for a kiosk/display. The token value is generated automatically."}
         </SheetDescription>
       </SheetHeader>
 
@@ -84,7 +138,13 @@ export function ViewTokenForm({ onDone }: { onDone: () => void }) {
               form="view-token-form"
               disabled={!canSubmit}
             >
-              {isSubmitting ? "Creating..." : "Create view token"}
+              {isSubmitting
+                ? isEdit
+                  ? "Saving..."
+                  : "Creating..."
+                : isEdit
+                  ? "Save changes"
+                  : "Create view token"}
             </Button>
           )}
         </form.Subscribe>

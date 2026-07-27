@@ -26,6 +26,19 @@ export const createViewToken = authedOrThrowMutation({
   },
 })
 
+// Only the name is editable: `token` is generated server-side at creation and
+// viewers authenticate with it, so reassigning it would silently lock out every
+// kiosk already using it.
+export const updateViewToken = authedOrThrowMutation({
+  args: {
+    id: v.id('viewTokens'),
+    name: v.string(),
+  },
+  handler: async (ctx, { id, name }) => {
+    return await ctx.db.patch(id, { name })
+  },
+})
+
 export const deleteViewToken = authedOrThrowMutation({
   args: {
     id: v.id('viewTokens'),
@@ -45,6 +58,20 @@ export const getViewToken = authedOrThrowQuery({
       .withIndex('by_token', (q) => q.eq('token', token))
       .first()
     return viewToken
+  },
+})
+
+// Dashboard edit-form hydration. `getViewToken` above looks up by the *token
+// value* (viewer auth), which the dashboard never has — it only holds the row
+// id — and the table is paginated, so scanning `listViewTokens` would miss any
+// row past the loaded pages.
+export const getViewTokenById = queryWithAuthStatus({
+  args: {
+    id: v.id('viewTokens'),
+  },
+  handler: async (ctx, { id }) => {
+    if (ctx.authStatus === 'unauthorized') return null
+    return await ctx.db.get(id)
   },
 })
 

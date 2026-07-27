@@ -44,16 +44,16 @@ importers:
     dependencies:
       '@convex-dev/geospatial':
         specifier: ^0.2.1
-        version: 0.2.1(convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))
+        version: 0.2.1(convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
       convex:
         specifier: 'catalog:'
-        version: 1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+        version: 1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
       convex-helpers:
         specifier: 'catalog:'
-        version: 0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
+        version: 0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
       zod:
         specifier: 'catalog:'
         version: 4.4.3
@@ -90,7 +90,7 @@ importers:
         version: 5.6.2
       convex:
         specifier: 'catalog:'
-        version: 1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+        version: 1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
@@ -226,10 +226,10 @@ importers:
         version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       convex:
         specifier: 'catalog:'
-        version: 1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+        version: 1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
       convex-helpers:
         specifier: 'catalog:'
-        version: 0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
+        version: 0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -7721,10 +7721,10 @@ snapshots:
 
   '@colors/colors@1.6.0': {}
 
-  '@convex-dev/geospatial@0.2.1(convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))':
+  '@convex-dev/geospatial@0.2.1(convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))':
     dependencies:
       async-channel: 0.2.0
-      convex: 1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+      convex: 1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
       heap-js: 2.6.0
 
   '@cspotcode/source-map-support@0.8.1':
@@ -10931,16 +10931,16 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  convex-helpers@0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3):
+  convex-helpers@0.1.120(@standard-schema/spec@1.0.0)(convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3):
     dependencies:
-      convex: 1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
+      convex: 1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6)
     optionalDependencies:
       '@standard-schema/spec': 1.0.0
       react: 19.2.7
       typescript: 6.0.3
       zod: 4.4.3
 
-  convex@1.42.1(@clerk/clerk-react@5.45.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@clerk/react@6.11.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6):
+  convex@1.42.1(@clerk/clerk-react@5.45.0(react@19.2.7))(@clerk/react@6.11.3(react@19.2.7))(bufferutil@4.1.0)(react@19.2.7)(utf-8-validate@6.0.6):
     dependencies:
       esbuild: 0.27.0
       prettier: 3.9.4

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "convex/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { toast } from "sonner";
 
 import { api } from "@sizeupdashboard/convex/src/api/_generated/api.js";
@@ -51,7 +51,14 @@ export function EntityDrawer() {
   const sheetOpen = !!drawer && !isDelete;
 
   const runDelete = async () => {
-    if (!drawer || !id) return;
+    // A delete deep-link can arrive without an entity or id (e.g. a hand-edited
+    // `?drawer=view-token&mode=delete`). There is nothing to target, so fail
+    // visibly instead of leaving a Delete button that does nothing.
+    if (!drawer || !id) {
+      toast.error("Nothing to delete — this link is missing an item.");
+      close();
+      return;
+    }
     setDeleting(true);
     try {
       switch (drawer) {
@@ -80,7 +87,7 @@ export function EntityDrawer() {
   const renderForm = () => {
     switch (drawer) {
       case DrawerEntity.VIEW_TOKEN:
-        return <ViewTokenForm onDone={close} />;
+        return <ViewTokenForm id={id ?? undefined} onDone={close} />;
       case DrawerEntity.DISPATCH_TYPE:
         return mode === DrawerMode.IMPORT ? (
           <DispatchTypeImportForm onDone={close} />
@@ -106,7 +113,19 @@ export function EntityDrawer() {
           side="right"
           className="flex w-full flex-col gap-0 p-0 sm:max-w-lg"
         >
-          {sheetOpen && renderForm()}
+          {/*
+            Keyed so switching entity/mode/id while the sheet stays open (back
+            /forward between two `?mode=edit&id=…` URLs, or a deep link)
+            remounts the form. TanStack Form only reads `defaultValues` on
+            mount, so without this you'd edit row B showing row A's values.
+            A keyed Fragment rather than a wrapper element: SheetContent's
+            flex column expects the header/form/footer as direct children.
+          */}
+          {sheetOpen && (
+            <Fragment key={`${drawer}:${mode}:${id ?? "new"}`}>
+              {renderForm()}
+            </Fragment>
+          )}
         </SheetContent>
       </Sheet>
 

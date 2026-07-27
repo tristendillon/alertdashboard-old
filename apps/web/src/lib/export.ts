@@ -1,4 +1,4 @@
-import type { Table } from "@tanstack/react-table";
+import type { Row, Table } from "@tanstack/react-table";
 
 interface ExportOptions {
   excludeColumns?: string[];
@@ -49,10 +49,9 @@ export function exportTableToCSV<TData>(
   // Generate data rows
   const dataRows = rows.map((row) =>
     columns
-      .map((column) => {
-        const value = row.getValue(column.id);
-        return escapeCSVField(String(value ?? ""));
-      })
+      .map((column) =>
+        escapeCSVField(formatCSVValue(getRowValue(row, column.id))),
+      )
       .join(","),
   );
 
@@ -73,6 +72,57 @@ export function exportTableToCSV<TData>(
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   }
+}
+
+// Epoch-millisecond window used to recognise timestamps stored as plain
+// numbers (Convex `_creationTime`, `lastPing`, …): 2001-09-09 → 2100-01-01.
+// Anything outside it is treated as an ordinary number.
+const MIN_EPOCH_MS = 1_000_000_000_000;
+const MAX_EPOCH_MS = 4_102_444_800_000;
+
+/**
+ * `row.getValue` only works for columns declared with an `accessorKey` /
+ * `accessorFn`; display columns (an `id` plus a `cell` renderer) return
+ * undefined. Fall back to the raw row data under the same key so those columns
+ * export whatever the underlying record holds instead of an empty cell.
+ */
+function getRowValue<TData>(row: Row<TData>, columnId: string): unknown {
+  const value = row.getValue(columnId);
+  if (value !== undefined) {
+    return value;
+  }
+  const original = row.original as unknown as
+    Record<string, unknown> | undefined;
+  return original?.[columnId];
+}
+
+function formatCSVValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "";
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === "number") {
+    // Timestamps are far more readable as ISO than as an epoch number.
+    if (
+      Number.isFinite(value) &&
+      value >= MIN_EPOCH_MS &&
+      value <= MAX_EPOCH_MS
+    ) {
+      return new Date(value).toISOString();
+    }
+    return String(value);
+  }
+  if (typeof value === "object") {
+    // Objects and arrays stringify to "[object Object]" / a lossy join.
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
 }
 
 function escapeCSVField(field: string): string {

@@ -95,18 +95,32 @@ function DispatchTypeFormInner({
         toast.error("Group is required");
         return;
       }
-      const payload = {
-        code: value.code.trim(),
-        group: value.group,
-        name: value.name.trim() || undefined,
-        default: value.default,
-      };
+      const code = value.code.trim();
+      const name = value.name.trim();
       try {
         if (isEdit && existing) {
-          await updateDispatchType({ id: existing._id, diff: payload });
+          // `diff` is a nested object, and Convex strips `undefined` from
+          // nested values during serialization (only top-level args keep it).
+          // Sending `name: undefined` therefore dropped the key entirely and
+          // ctx.db.patch silently kept the old name. Send the empty string
+          // instead: `name` is v.optional(v.string()) so "" is a valid stored
+          // value, it is falsy everywhere it is read (the table renders
+          // "No name") and the server's derived search text trims it away.
+          await updateDispatchType({
+            id: existing._id,
+            diff: { code, group: value.group, name, default: value.default },
+          });
           toast.success("Dispatch type updated");
         } else {
-          await createDispatchType(payload);
+          // Create is a top-level arg, so `undefined` really does mean
+          // "no name" — keep that asymmetry so new rows omit the field
+          // rather than storing an empty string.
+          await createDispatchType({
+            code,
+            group: value.group,
+            name: name || undefined,
+            default: value.default,
+          });
           toast.success("Dispatch type created");
         }
         onDone();

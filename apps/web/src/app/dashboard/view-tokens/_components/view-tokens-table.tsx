@@ -95,6 +95,11 @@ export function ViewTokensTable() {
       {
         id: "status",
         header: "Status",
+        // Derived from clientCounts, which lives here rather than on the row —
+        // an accessorFn is what lets CSV export read it (export.ts reads through
+        // row.getValue, which is undefined for display-only columns).
+        accessorFn: (row) =>
+          (clientCounts.get(row._id) ?? 0) > 0 ? "Online" : "Offline",
         size: 110,
         enableResizing: true,
         enableSorting: false,
@@ -118,6 +123,8 @@ export function ViewTokensTable() {
       {
         id: "clients",
         header: "Clients",
+        // Same as `status`: derived here, so export needs an accessorFn.
+        accessorFn: (row) => clientCounts.get(row._id) ?? 0,
         size: 110,
         enableResizing: true,
         enableSorting: false,

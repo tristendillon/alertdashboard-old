@@ -18,10 +18,19 @@ export default async function DashboardLayout({
       <SidebarProvider defaultOpen={defaultOpen}>
         <DashboardSidebar />
         <SidebarInset>
-          <EntityDrawer />
           <DashboardHeader />
           <div className="flex flex-1 flex-col gap-4 p-4">
-            <AuthedGate>{children}</AuthedGate>
+            {/*
+              EntityDrawer is inside AuthedGate so its edit-hydration queries
+              only run once Convex holds a Clerk token — before that they
+              resolve to `[]` (not `undefined`) and a deep-linked edit URL
+              flashes "not found". It renders only Radix portals, so sitting
+              in this padded flex column costs it no layout.
+            */}
+            <AuthedGate>
+              <EntityDrawer />
+              {children}
+            </AuthedGate>
           </div>
         </SidebarInset>
       </SidebarProvider>

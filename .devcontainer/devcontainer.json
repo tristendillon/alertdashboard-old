@@ -38,6 +38,5 @@
       "extensions": ["mkhl.direnv", "jnoortheen.nix-ide", "hashicorp.terraform"]
     }
   },
-  "forwardPorts": [3000],
   "remoteUser": "vscode"
 }

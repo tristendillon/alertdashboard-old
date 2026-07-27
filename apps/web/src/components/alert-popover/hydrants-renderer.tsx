@@ -27,13 +27,22 @@ const Hydrants = (bounds: LatLngBounds) => {
   const { status, results, loadMore } = usePaginatedQuery(
     api.hydrants.getHydrantsByBounds,
     {
+      // Corner convention (must match getHydrantsByBounds in
+      // apps/convex/src/api/hydrants.ts, which builds its S2 rectangle as
+      // `{ west: topLeft.longitude, south: topLeft.latitude,
+      //    east: bottomRight.longitude, north: bottomRight.latitude }`):
+      //   topLeft     = south-west corner (min latitude, min longitude)
+      //   bottomRight = north-east corner (max latitude, max longitude)
+      // Sending them the other way round yields west > east, an inverted
+      // longitude interval that matches everything *outside* the viewport,
+      // so no hydrants ever render.
       topLeft: {
-        latitude: bounds.north,
-        longitude: bounds.east,
-      },
-      bottomRight: {
         latitude: bounds.south,
         longitude: bounds.west,
+      },
+      bottomRight: {
+        latitude: bounds.north,
+        longitude: bounds.east,
       },
     },
     {
